@@ -1,0 +1,10 @@
+import {
+  "moonbitlang/core/string",
+  "ouoankang/moonbit-pdf417/src/pdf417",
+}
+
+pkgtype(kind: "executable")
+
+// Browser entry point: publishes `globalThis.pdf417` for web/index.html.
+// Restricted to `js` because that is the only backend with a `globalThis`.
+supported_targets = "js"

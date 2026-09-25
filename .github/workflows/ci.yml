@@ -39,6 +39,12 @@ jobs:
         # Encode -> decode round trip over a built-in corpus.
         run: moon run --target js cmd/main -- selfcheck
 
+      - name: Browser bundle smoke test
+        # The bundle is a plain script that publishes globalThis.pdf417. Running
+        # it in Node with two globals stubbed checks the FFI wiring, which is
+        # the part that can silently break without a browser.
+        run: node scripts/check_web.mjs
+
   # Generated files must be reproducible from their scripts. If this job fails,
   # someone edited a generated file by hand or forgot to re-run a script.
   generated-files-are-current:
@@ -56,10 +62,11 @@ jobs:
       - name: Install script dependencies
         run: pip install -r scripts/requirements.txt
 
-      - name: Regenerate tables and vectors
+      - name: Regenerate tables, vectors and the browser bundle
         run: |
           python scripts/gen_codeword_table.py
           python scripts/gen_vectors.py
+          python scripts/build_web.py
 
       - name: Fail if regeneration changed anything
         run: |
