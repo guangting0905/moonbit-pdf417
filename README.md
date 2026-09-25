@@ -188,6 +188,10 @@ moon run --target js cmd/main -- selfcheck
 
 ### 6. 在浏览器里试
 
+**在线试用（已部署）**：<https://guangting0905.github.io/moonbit-pdf417/>
+
+也可以本地跑：
+
 ```sh
 python scripts/build_web.py                        # 编译成单个 JS
 python -m http.server 8080 --directory web
