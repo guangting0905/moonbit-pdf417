@@ -4,8 +4,8 @@
 
 <table>
 <tr><td align="center">
-<img src="docs/assets/sample.png" width="420" alt="PDF417 symbol encoding https://github.com/ouoankang/moonbit-pdf417"><br>
-<sub><code>encode text:https://github.com/ouoankang/moonbit-pdf417 --columns 6 --ec-level 4</code><br>
+<img src="docs/assets/sample.png" width="420" alt="PDF417 symbol encoding https://github.com/guangting0905/moonbit-pdf417"><br>
+<sub><code>encode text:https://github.com/guangting0905/moonbit-pdf417 --columns 6 --ec-level 4</code><br>
 上面这张图由本项目生成，已用 zxing-cpp 扫回原字符串（见 <code>scripts/gen_samples.py</code>）</sub>
 </td></tr>
 </table>

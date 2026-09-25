@@ -19,4 +19,4 @@ println(decoded.report().corrected_errors())  // Reed-Solomon 修正了几个码
 - 证据：127 条与独立参考实现的一致性向量、202 个单元测试、
   错误注入恢复、以及用 zxing-cpp 读回生成位图。
 
-完整说明、验收命令与已知边界见仓库根目录的 [README.md](https://github.com/ouoankang/moonbit-pdf417)。
+完整说明、验收命令与已知边界见仓库根目录的 [README.md](https://github.com/guangting0905/moonbit-pdf417)。

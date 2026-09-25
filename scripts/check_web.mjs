@@ -39,7 +39,7 @@ check("bundle fires the pdf417-ready event", readyFired);
 if (!api) process.exit(1);
 
 // 1. SVG
-const svg = api.run("text", "https://github.com/ouoankang/moonbit-pdf417", "6,4", "svg");
+const svg = api.run("text", "https://github.com/guangting0905/moonbit-pdf417", "6,4", "svg");
 check("svg output is a document", svg.startsWith("<?xml"), `${svg.length} bytes`);
 check("svg carries the dark colour", svg.includes("#000000"));
 

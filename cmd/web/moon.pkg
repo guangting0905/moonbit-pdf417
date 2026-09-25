@@ -1,6 +1,6 @@
 import {
   "moonbitlang/core/string",
-  "ouoankang/moonbit-pdf417/src/pdf417",
+  "guangting0905/moonbit-pdf417/src/pdf417",
 }
 
 pkgtype(kind: "executable")

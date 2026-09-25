@@ -24,7 +24,7 @@ ASSETS = os.path.join(ROOT, "docs", "assets")
 SAMPLES = [
     (
         "sample",
-        "https://github.com/ouoankang/moonbit-pdf417",
+        "https://github.com/guangting0905/moonbit-pdf417",
         6,
         4,
         3,
