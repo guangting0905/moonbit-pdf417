@@ -168,9 +168,14 @@ def injection_sweep(rng, patterns, per_level=6):
                 continue
             payload_ok = bytes.fromhex(got) == data
             corrected = int(fields.get("corrected", "-1"))
+            # 判据是「载荷完好」：corrected 只反映 Reed-Solomon 层实际修正的
+            # 码字数，可能小于注入数 k——因为最近邻图案匹配有时会把一个
+            # 被打坏的符号字符"吸"回正确值，那一处就无需 RS 再修。
+            # 所以这里只要求 payload 复原、且 corrected 落在 [1, k] 之间。
+            ok = payload_ok and 1 <= corrected <= k
             results.append((
                 ec, columns, k,
-                "OK" if (payload_ok and corrected == k) else
+                "OK" if ok else
                 f"payload_ok={payload_ok} corrected={corrected}",
             ))
     return results
