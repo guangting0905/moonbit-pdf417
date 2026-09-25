@@ -1,0 +1,18 @@
+# Dependencies for the verification scripts under scripts/.
+#
+# These are NOT build or runtime dependencies of the MoonBit library - the
+# library itself depends only on moonbitlang/core. They exist to run the
+# cross-checks: vector generation from an independent implementation, and
+# decoding our own output with an industrial barcode reader.
+
+# Independent PDF417 reference implementation, used by scripts/gen_vectors.py
+# and scripts/gen_codeword_table.py. MIT licensed, see tests/vectors/.
+pdf417gen==0.8.1
+
+# Industrial barcode decoder (Google ZXing, C++ core), used by
+# scripts/verify_zxing.py and scripts/gen_samples.py.
+zxing-cpp==3.1.1
+
+# Bitmap handling for the PNG previews in docs/assets.
+Pillow>=10
+numpy>=1.26
