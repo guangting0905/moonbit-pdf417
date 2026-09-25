@@ -1,0 +1,21 @@
+# Keep line endings stable across platforms.
+#
+# The CI job "generated files are current" regenerates the tables and vectors
+# and then fails if `git diff` is non-empty. On Windows, `core.autocrlf` would
+# otherwise rewrite the generated files on checkout and make that job fail for
+# a reason that has nothing to do with the code.
+
+* text=auto eol=lf
+
+# Generated data tables: written by scripts/, read by the MoonBit compiler.
+*.mbt text eol=lf
+*.json text eol=lf
+*.py text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.svg text eol=lf
+
+# Binary assets must never be normalised.
+*.png binary
+*.pbm binary
+*.zip binary

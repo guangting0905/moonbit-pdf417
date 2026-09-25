@@ -1,0 +1,14 @@
+import {
+  "moonbitlang/core/env",
+  "moonbitlang/core/string",
+  "ouoankang/moonbit-pdf417/src/pdf417",
+}
+
+pkgtype(kind: "executable")
+
+// The library is target-agnostic and builds for every backend. This front end
+// is restricted to `js` because it reads `process.argv` for its arguments, and
+// declaring that here keeps `moon build --target all` honest instead of
+// failing on a missing C compiler for a package that has no business being
+// compiled to native in the first place.
+supported_targets = "js"

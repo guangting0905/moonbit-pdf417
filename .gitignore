@@ -1,0 +1,20 @@
+# MoonBit build output
+_build/
+target/
+target
+.mooncakes/
+.moonagent/
+
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Python bytecode from the verification scripts
+__pycache__/
+*.pyc
+
+# Locally generated output from the CLI
+*.pbm
+sample-local.*

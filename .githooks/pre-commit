@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# Commit hook: the same two checks CI runs first.
+#
+# Kept deliberately short so it never becomes something people disable.
+# The heavier evidence (random round trips, zxing-cpp) stays in CI on purpose.
+
+set -e
+
+if ! command -v moon >/dev/null 2>&1; then
+  echo "pre-commit: moon not found on PATH, skipping checks"
+  exit 0
+fi
+
+echo "pre-commit: moon check"
+moon check
+
+echo "pre-commit: moon test"
+moon test
