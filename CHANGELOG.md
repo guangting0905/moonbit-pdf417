@@ -34,6 +34,14 @@
 - `to_text`（终端）、`to_pbm`（P1，一行一样本）、`to_svg`（暗模块按水平游程合并）。
 - 不出 PNG／JPEG：位图栅格化属于图像库职责，输出 PBM 后一行 shell 即可接上。
 
+### 浏览器与命令行
+
+- `cmd/main`：`encode` / `decode` / `info` / `selfcheck`，参数进、stdout 出，
+  不读文件、不用 FFI，因此 `moon build --target all` 不需要 C 编译器之外的依赖。
+- `cmd/web` + `web/index.html`：把编解码暴露给浏览器的在线试用页。
+  跨 FFI 边界只传字符串，bundle 是普通脚本，页面一个 `<script src>` 即可。
+  `scripts/check_web.mjs` 用 Node 加两个桩全局变量对该产物做冒烟测试。
+
 ### 验收证据
 
 | 层 | 结果 |

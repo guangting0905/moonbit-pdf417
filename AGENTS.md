@@ -78,10 +78,24 @@
 ```sh
 moon check                                  # 零警告
 moon test                                   # 202 个用例
+python scripts/build_web.py                 # 重新编译浏览器产物
+node scripts/check_web.mjs                  # 冒烟测试该产物（需要 Node）
 python scripts/verify_roundtrip.py          # 随机往返 + 错误注入（需 Python）
 python scripts/verify_zxing.py              # 工业解码器验证（需 zxing-cpp）
 python scripts/gen_samples.py               # 重新生成示例图并验证可扫
 ```
+
+## 浏览器产物
+
+`web/pdf417.js` 是 `moon build --target js --release` 的产物，**故意入库**：
+页面要能在静态托管（GitHub Pages、内网 nginx）上直接打开，读者不必装 MoonBit
+工具链。改了 `src/` 或 `cmd/web/` 之后必须重跑 `scripts/build_web.py`，
+CI 的「生成物时效」作业会重新构建并检查 diff。
+
+`cmd/web` 与 `cmd/main` 一样声明 `supported_targets = "js"`。
+跨 FFI 边界只传字符串——`js_publish` 收一个
+`(String, String, String, String) -> String` 并挂到 `globalThis.pdf417`。
+这个 bundle 是普通脚本（不是 ES module），页面只需一个 `<script src>`。
 
 ## 关于「完成的定义」
 

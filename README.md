@@ -186,6 +186,19 @@ moon run --target js cmd/main -- selfcheck
 
 对一个内置语料做完整的 encode → decode 往返，逐条打印几何参数。
 
+### 6. 在浏览器里试
+
+```sh
+python scripts/build_web.py                        # 编译成单个 JS
+python -m http.server 8080 --directory web
+# 打开 http://localhost:8080/
+```
+
+页面把编码与解码都暴露出来，全部在浏览器里跑，不发网络请求：
+左边输入载荷就能拿到可扫的 SVG，右边把「终端网格」粘回去就能解出字节。
+`scripts/check_web.mjs` 用 Node 加两个桩全局变量跑同一份产物，
+覆盖了每种输出格式与一次完整往返——不用浏览器也能发现 FFI 接线断了。
+
 ---
 
 ## 在代码里用
@@ -307,14 +320,22 @@ python scripts/gen_samples.py       # 顺便重新生成 docs/assets 里的示�
 │   ├── codeword_table.mbt  生成物：929 × 3 符号字符图案表
 │   ├── text_table.mbt      生成物：文本子模式表与切换码
 │   └── *_test.mbt / *_wbtest.mbt
-├── cmd/main/               CLI：encode / decode / info / selfcheck
+├── cmd/
+│   ├── main/               CLI：encode / decode / info / selfcheck
+│   └── web/                浏览器入口：把 API 挂到 globalThis
 ├── tests/vectors/          随仓库版本化的一致性向量与纠错系数表
 ├── scripts/
 │   ├── gen_codeword_table.py   生成图案表与文本表，并核对纠错系数
 │   ├── gen_vectors.py          从 pdf417gen 生成一致性向量
 │   ├── verify_roundtrip.py     随机往返 + 错误注入
 │   ├── verify_zxing.py         交给 zxing-cpp 解码
-│   └── gen_samples.py          重新生成 docs/assets 并验证可扫
+│   ├── gen_samples.py          重新生成 docs/assets 并验证可扫
+│   ├── build_web.py            编译浏览器产物
+│   └── check_web.mjs           用 Node 冒烟测试该产物
+├── web/
+│   ├── index.html          在线试用页（编码 + 解码）
+│   ├── pdf417.js           构建产物，随仓库版本化以便静态托管
+│   └── README.md
 └── docs/
     ├── assets/             README 里那几张条码
     ├── DECODING.md         解码链路逐步说明
