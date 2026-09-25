@@ -42,8 +42,12 @@ jobs:
       - name: Browser bundle smoke test
         # The bundle is a plain script that publishes globalThis.pdf417. Running
         # it in Node with two globals stubbed checks the FFI wiring, which is
-        # the part that can silently break without a browser.
-        run: node scripts/check_web.mjs
+        # the part that can silently break without a browser. Rebuild it first
+        # so the test exercises this toolchain's output, not a stale commit.
+        # build_web.py uses only the standard library, so no pip install needed.
+        run: |
+          python3 scripts/build_web.py
+          node scripts/check_web.mjs
 
   # Generated files must be reproducible from their scripts. If this job fails,
   # someone edited a generated file by hand or forgot to re-run a script.
@@ -62,11 +66,14 @@ jobs:
       - name: Install script dependencies
         run: pip install -r scripts/requirements.txt
 
-      - name: Regenerate tables, vectors and the browser bundle
+      # Only the Python-generated tables and vectors are reproducible byte for
+      # byte. web/pdf417.js is a MoonBit compiler artifact whose bytes depend
+      # on the exact toolchain version, so it is deliberately NOT checked here;
+      # the `test` job above rebuilds and smoke-tests it instead.
+      - name: Regenerate tables and vectors
         run: |
           python scripts/gen_codeword_table.py
           python scripts/gen_vectors.py
-          python scripts/build_web.py
 
       - name: Fail if regeneration changed anything
         run: |
