@@ -1,0 +1,97 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  # Fast, offline, no third-party dependencies: what a contributor should run
+  # before pushing.
+  test:
+    name: check + test (all targets)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
+
+      - name: Toolchain versions
+        run: moon version --all
+
+      - name: Type check every target
+        # `all` covers native as well; the library is pure MoonBit, and the CLI
+        # declares supported_targets = "js", so nothing here needs a C compiler
+        # beyond what the runner already has.
+        run: moon check --target all
+
+      - name: Unit tests and conformance vectors
+        # 202 tests, including the 127 generated conformance cases that pin the
+        # codeword stream and module grid against an independent implementation.
+        run: moon test --target wasm
+
+      - name: CLI self check
+        # Encode -> decode round trip over a built-in corpus.
+        run: moon run --target js cmd/main -- selfcheck
+
+  # Generated files must be reproducible from their scripts. If this job fails,
+  # someone edited a generated file by hand or forgot to re-run a script.
+  generated-files-are-current:
+    name: generated files are current
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
+
+      - name: Install script dependencies
+        run: pip install -r scripts/requirements.txt
+
+      - name: Regenerate tables and vectors
+        run: |
+          python scripts/gen_codeword_table.py
+          python scripts/gen_vectors.py
+
+      - name: Fail if regeneration changed anything
+        run: |
+          if ! git diff --quiet; then
+            echo "::error::generated files are out of date; re-run the scripts in scripts/ and commit the result"
+            git --no-pager diff --stat
+            exit 1
+          fi
+
+  # The evidence that matters most: an independent encoder agrees codeword for
+  # codeword, an industrial decoder reads our output back, and injected symbol
+  # errors are repaired.
+  cross-verification:
+    name: cross verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
+
+      - name: Install script dependencies
+        run: pip install -r scripts/requirements.txt
+
+      - name: Random round trips and error injection
+        run: python scripts/verify_roundtrip.py --trials 120
+
+      - name: Decode our output with zxing-cpp
+        run: python scripts/verify_zxing.py
+
+      - name: Regenerate and verify the sample barcodes
+        run: python scripts/gen_samples.py
