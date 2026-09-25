@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>moonbit-pdf417 —— 在线试用</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #ffffff; --panel: #f6f7f9; --line: #d9dce1;
+    --fg: #1b1f24; --muted: #656d76; --accent: #0b6bcb;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14171c; --panel: #1b1f26; --line: #2c333d;
+      --fg: #e8eaed; --muted: #9aa4b0; --accent: #6cb6ff;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 28px 20px 60px;
+    background: var(--bg); color: var(--fg);
+    font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI",
+          "PingFang SC", "Microsoft YaHei", sans-serif;
+  }
+  .wrap { max-width: 940px; margin: 0 auto; }
+  h1 { font-size: 22px; margin: 0 0 6px; }
+  h1 code { font: 600 22px var(--mono); }
+  p.lede { color: var(--muted); margin: 0 0 22px; }
+  p.lede a { color: var(--accent); }
+  .tabs { display: flex; gap: 6px; margin-bottom: -1px; }
+  .tabs button {
+    border: 1px solid var(--line); border-bottom: none;
+    background: var(--panel); color: var(--muted);
+    padding: 8px 16px; border-radius: 8px 8px 0 0; cursor: pointer;
+    font-size: 14px;
+  }
+  .tabs button[aria-selected="true"] {
+    background: var(--bg); color: var(--fg); font-weight: 600;
+  }
+  .panel {
+    border: 1px solid var(--line); border-radius: 0 8px 8px 8px;
+    background: var(--panel); padding: 18px;
+  }
+  .row { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; margin-bottom: 14px; }
+  label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+  textarea, input, select {
+    background: var(--bg); color: var(--fg);
+    border: 1px solid var(--line); border-radius: 6px;
+    padding: 8px 10px; font-size: 14px; font-family: inherit;
+  }
+  textarea { width: 100%; font-family: var(--mono); font-size: 13px; resize: vertical; }
+  input[type=number] { width: 88px; }
+  button.go {
+    background: var(--accent); color: #fff; border: none;
+    padding: 9px 20px; border-radius: 6px; font-size: 14px;
+    font-weight: 600; cursor: pointer;
+  }
+  button.go:disabled { opacity: .5; cursor: default; }
+  .out { margin-top: 16px; }
+  .out .box {
+    background: var(--bg); border: 1px solid var(--line); border-radius: 6px;
+    padding: 12px; overflow: auto; max-height: 460px;
+  }
+  pre { margin: 0; font: 12.5px/1.35 var(--mono); white-space: pre; }
+  .svgbox svg { display: block; max-width: 100%; height: auto; image-rendering: pixelated; }
+  .status { font-size: 13px; color: var(--muted); margin-top: 10px; }
+  .status.err { color: #d1242f; }
+  .hint { font-size: 12.5px; color: var(--muted); margin-top: 8px; }
+  details { margin-top: 20px; }
+  summary { cursor: pointer; color: var(--muted); font-size: 13.5px; }
+  details ul { color: var(--muted); font-size: 13.5px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1><code>moonbit-pdf417</code> 在线试用</h1>
+  <p class="lede">
+    下面的编解码全部由 MoonBit 编译成的 WebAssembly/JS 在你浏览器里跑，
+    没有服务端调用。源码：<a href="https://github.com/guangting0905/moonbit-pdf417">github.com/guangting0905/moonbit-pdf417</a>
+  </p>
+
+  <div class="tabs" role="tablist">
+    <button id="tab-encode" role="tab" aria-selected="true">编码</button>
+    <button id="tab-decode" role="tab" aria-selected="false">解码</button>
+  </div>
+
+  <div class="panel" id="panel-encode" role="tabpanel">
+    <div class="row">
+      <div style="flex:1 1 320px">
+        <label for="payload">载荷（文本，或十六进制字节）</label>
+        <textarea id="payload" rows="3">https://github.com/guangting0905/moonbit-pdf417</textarea>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label for="kind">载荷类型</label>
+        <select id="kind">
+          <option value="text">文本（UTF-8）</option>
+          <option value="hex">十六进制字节</option>
+        </select>
+      </div>
+      <div>
+        <label for="columns">列数 1–30</label>
+        <input type="number" id="columns" value="6" min="1" max="30">
+      </div>
+      <div>
+        <label for="ec">纠错级别 0–8</label>
+        <input type="number" id="ec" value="4" min="0" max="8">
+      </div>
+      <div>
+        <label for="format">输出</label>
+        <select id="format">
+          <option value="svg">SVG 条码</option>
+          <option value="text">终端网格</option>
+          <option value="json">几何摘要</option>
+          <option value="codewords">码字流</option>
+        </select>
+      </div>
+      <button class="go" id="go-encode">生成</button>
+    </div>
+    <div class="out" id="out-encode"></div>
+  </div>
+
+  <div class="panel" id="panel-decode" role="tabpanel" hidden>
+    <label for="matrix">模块矩阵（每行 <code>#</code>/<code>.</code>，一行一个符号行）</label>
+    <textarea id="matrix" rows="6" placeholder="先用编码页生成，输出选「终端网格」，把结果粘到这里"></textarea>
+    <div class="row" style="margin-top:14px">
+      <button class="go" id="go-decode">解码</button>
+    </div>
+    <div class="out" id="out-decode"></div>
+  </div>
+
+  <details>
+    <summary>这一页在演示什么</summary>
+    <ul>
+      <li><b>三种压缩模式</b>：把载荷里的字母、长数字串、非 ASCII 字节分别用文本／数字／字节压缩，分段结果可以在「几何摘要」里看到。</li>
+      <li><b>纠错</b>：级别 0–8 对应 2–512 个 GF(929) 上的 Reed-Solomon 纠错码字。</li>
+      <li><b>逆过程</b>：解码页把矩阵解回字节，并给出「未精确匹配的符号字符数」与「实际修正的码字数」——两者分开，因为它们说明的是损伤程度与纠错余量两件不同的事。</li>
+      <li><b>边界</b>：解码器吃的是模块矩阵，不是照片。不做图像识别是有意的，见 README 的「已知限制」。</li>
+    </ul>
+  </details>
+</div>
+
+<script src="./pdf417.js"></script>
+<script>
+(function () {
+  var api = globalThis.pdf417;
+
+  function el(id) { return document.getElementById(id); }
+
+  function setOut(box, text, isError) {
+    box.innerHTML = '';
+    var status;
+    if (isError) {
+      status = document.createElement('div');
+      status.className = 'status err';
+      status.textContent = text;
+      box.appendChild(status);
+      return;
+    }
+    var wrap = document.createElement('div');
+    wrap.className = 'box';
+    var pre = document.createElement('pre');
+    pre.textContent = text;
+    wrap.appendChild(pre);
+    box.appendChild(wrap);
+  }
+
+  function setSvg(box, svg) {
+    box.innerHTML = '';
+    var wrap = document.createElement('div');
+    wrap.className = 'box svgbox';
+    wrap.innerHTML = svg;
+    box.appendChild(wrap);
+    var hint = document.createElement('div');
+    hint.className = 'hint';
+    hint.textContent = '用手机相机或任意条码扫描 App 扫一下试试。';
+    box.appendChild(hint);
+  }
+
+  function encode() {
+    var box = el('out-encode');
+    var kind = el('kind').value;
+    var payload = el('payload').value;
+    var options = el('columns').value + ',' + el('ec').value;
+    var format = el('format').value;
+    var out = api.run(kind, payload, options, format);
+    if (out.lastIndexOf('error: ', 0) === 0) { setOut(box, out.slice(7), true); return; }
+    if (format === 'svg') { setSvg(box, out); return; }
+    if (format === 'text') {
+      setOut(box, out, false);
+      var hint = document.createElement('div');
+      hint.className = 'hint';
+      hint.textContent = '把这段原样粘到「解码」页就能解回来。';
+      box.appendChild(hint);
+      return;
+    }
+    setOut(box, out, false);
+  }
+
+  function decode() {
+    var box = el('out-decode');
+    var out = api.run('text', el('matrix').value, '0,0', 'decode');
+    if (out.lastIndexOf('error: ', 0) === 0) { setOut(box, out.slice(7), true); return; }
+    setOut(box, out, false);
+  }
+
+  function select(which) {
+    var encodeTab = which === 'encode';
+    el('tab-encode').setAttribute('aria-selected', String(encodeTab));
+    el('tab-decode').setAttribute('aria-selected', String(!encodeTab));
+    el('panel-encode').hidden = !encodeTab;
+    el('panel-decode').hidden = encodeTab;
+  }
+
+  el('tab-encode').addEventListener('click', function () { select('encode'); });
+  el('tab-decode').addEventListener('click', function () { select('decode'); });
+  el('go-encode').addEventListener('click', encode);
+  el('go-decode').addEventListener('click', decode);
+
+  if (!api) {
+    el('out-encode').innerHTML =
+      '<div class="status err">pdf417.js 没加载成功。先跑 ' +
+      '<code>python scripts/build_web.py</code> 生成它。</div>';
+  } else {
+    encode();
+  }
+})();
+</script>
+</body>
+</html>
